@@ -51,7 +51,7 @@ Next: /test {ID}
 **On `-v` or `--version`:**
 Display:
 ```
-Workflow Skills v1.5.0
+Workflow Skills v1.5.1
 https://github.com/eljun/workflow-skills
 ```
 
@@ -290,7 +290,7 @@ Ready for /simplify
 When invoked with `/implement auto {ID}` OR task document has `Automation: auto`:
 
 1. If invoked with `auto` argument, update the task document to set `Automation: auto`
-2. After implementation completes, automatically invoke `/test {ID}`
+2. After implementation completes, automatically invoke `/simplify {ID}`
 
 ## Pre-Implementation Checklist
 

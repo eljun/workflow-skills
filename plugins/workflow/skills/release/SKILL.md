@@ -53,7 +53,7 @@ Examples:
 **On `-v` or `--version`:**
 Display:
 ```
-Workflow Skills v1.5.0
+Workflow Skills v1.5.1
 https://github.com/eljun/workflow-skills
 ```
 
