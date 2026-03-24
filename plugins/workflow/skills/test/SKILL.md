@@ -92,6 +92,12 @@ Interactive mode requires Playwright MCP. **No npm install needed** - Claude Cod
 
 **Playwright MCP is REQUIRED for interactive mode.** Before running tests, verify that `mcp__playwright__browser_navigate` is available as a tool. If Playwright MCP tools are not available:
 
+**If running in auto mode** (task doc has `Automation: auto`):
+- **Automatically fall back to CI mode** — do NOT stop the chain
+- Notify the user with: `[AUTO] Playwright MCP not available. Falling back to CI mode for /test --ci {task-name}.`
+- Proceed with CI mode workflow
+
+**If running in manual mode** (no `Automation: auto`):
 1. **STOP** - Do not proceed with testing
 2. **Notify the user** with this message:
    ```
@@ -237,23 +243,32 @@ The `{ID}` can be:
                              │                           │
                              ▼                           ▼
                ┌─────────────────────┐    ┌──────────────────────────┐
-               │ MODE = Interactive  │    │ **STOP IMMEDIATELY**     │
-               │ Proceed to          │    │                          │
-               │ Interactive workflow│    │ Display this message:    │
-               └─────────────────────┘    │ "Playwright MCP is not   │
-                                          │ configured. See prereqs."│
-                                          │                          │
-                                          │ DO NOT:                  │
-                                          │ - Fall back to CI mode   │
-                                          │ - Use curl/source code   │
-                                          │ - Proceed with testing   │
-                                          └──────────────────────────┘
+               │ MODE = Interactive  │    │ Check Automation field   │
+               │ Proceed to          │    │ in task document         │
+               │ Interactive workflow│    └──────────────────────────┘
+               └─────────────────────┘               │
+                                          ┌──────────┴──────────┐
+                                          │                     │
+                                          ▼                     ▼
+                                   Automation: auto      Manual mode
+                                          │                     │
+                                          ▼                     ▼
+                               ┌─────────────────┐  ┌──────────────────────┐
+                               │ Fall back to    │  │ **STOP IMMEDIATELY** │
+                               │ CI mode         │  │                      │
+                               │ Notify user of  │  │ Display prereqs      │
+                               │ fallback        │  │ message. DO NOT:     │
+                               └─────────────────┘  │ - Fall back to CI   │
+                                                     │ - Use curl/source   │
+                                                     │ - Proceed testing   │
+                                                     └──────────────────────┘
 ```
 
 **ABSOLUTE RULES:**
-1. **No --ci flag + No Playwright MCP = STOP.** Do not proceed. Do not fall back.
-2. **No --ci flag + Playwright MCP available = Interactive mode ONLY.** Never create test scripts.
-3. **--ci flag present = CI mode.** Playwright MCP not required.
+1. **No --ci flag + No Playwright MCP + Manual mode = STOP.** Do not proceed. Do not fall back to CI.
+2. **No --ci flag + No Playwright MCP + Auto mode = Fall back to CI mode silently.** Notify user and continue the chain.
+3. **No --ci flag + Playwright MCP available = Interactive mode ONLY.** Never create test scripts.
+4. **--ci flag present = CI mode.** Playwright MCP not required.
 
 **How to check for Playwright MCP:**
 Look for tools starting with `mcp__playwright__browser_` in your available tools. If you see tools like `mcp__playwright__browser_navigate`, `mcp__playwright__browser_click`, etc., Playwright MCP is available.
@@ -268,7 +283,9 @@ Look for tools starting with `mcp__playwright__browser_` in your available tools
 
 **Entry condition:** No `--ci` flag AND Playwright MCP tools are available.
 
-**If Playwright MCP is NOT available:** STOP. Do not use this workflow. Do not fall back to CI mode. Notify user to configure Playwright MCP.
+**If Playwright MCP is NOT available:**
+- **Auto mode** (`Automation: auto` in task doc): Fall back to CI mode. Do not stop. Notify user: `[AUTO] Playwright MCP not available. Falling back to CI mode for /test --ci {task-name}.`
+- **Manual mode**: STOP. Do not use this workflow. Do not fall back to CI mode. Notify user to configure Playwright MCP.
 
 ```
 /test {task-name}
